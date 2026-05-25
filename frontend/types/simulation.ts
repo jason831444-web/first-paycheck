@@ -91,3 +91,35 @@ export interface SavedScenario extends SimulationInput {
   created_at: string;
   result?: SimulationResult;
 }
+
+export interface CompareLocationsRequest {
+  annual_salary: number;
+  pay_frequency: PayFrequency;
+  tax_year: number;
+  filing_status: "single";
+  work_state: WorkState;
+  fica_exempt: boolean;
+  contribution_401k_percent: number;
+  health_insurance_monthly: number;
+  locations: ResidenceLocation[];
+}
+
+export interface LocationComparisonResult {
+  location: ResidenceLocation;
+  preset_name: string;
+  gross_monthly: number;
+  net_monthly: number;
+  rent: number;
+  transportation_cost: number;
+  total_expenses: number;
+  monthly_leftover: number;
+  housing_ratio: number;
+  savings_rate: number;
+  risk_level: RiskLevel;
+  affordability_score: number;
+  recommendation_text: string;
+}
+
+export interface CompareLocationsResponse {
+  results: LocationComparisonResult[];
+}

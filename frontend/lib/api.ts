@@ -1,4 +1,11 @@
-import { CityPreset, SavedScenario, SimulationInput, SimulationResult } from "@/types/simulation";
+import {
+  CityPreset,
+  CompareLocationsRequest,
+  CompareLocationsResponse,
+  SavedScenario,
+  SimulationInput,
+  SimulationResult,
+} from "@/types/simulation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
@@ -24,6 +31,8 @@ export const api = {
   simulate: (input: SimulationInput) =>
     request<SimulationResult>("/api/simulate", { method: "POST", body: JSON.stringify(input) }),
   cityPresets: () => request<CityPreset[]>("/api/city-presets"),
+  compareLocations: (input: CompareLocationsRequest) =>
+    request<CompareLocationsResponse>("/api/compare-locations", { method: "POST", body: JSON.stringify(input) }),
   saveScenario: (input: SimulationInput) =>
     request<SavedScenario>("/api/scenarios", { method: "POST", body: JSON.stringify(input) }),
   scenarios: () => request<SavedScenario[]>("/api/scenarios"),
