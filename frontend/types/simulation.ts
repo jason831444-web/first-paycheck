@@ -1,6 +1,6 @@
 export type PayFrequency = "monthly" | "semi_monthly" | "biweekly";
-export type WorkState = "NY" | "NJ";
-export type ResidenceLocation = "Manhattan" | "Brooklyn" | "Jersey City" | "Hoboken" | "NJ Suburb";
+export type WorkState = string;
+export type ResidenceLocation = string;
 export type TransportationType = "public_transit" | "car" | "hybrid";
 export type RiskLevel = "Comfortable" | "Manageable" | "Tight" | "Risky";
 
@@ -12,6 +12,7 @@ export interface SimulationInput {
   filing_status: "single";
   work_state: WorkState;
   residence_location: ResidenceLocation;
+  residence_state?: string;
   fica_exempt: boolean;
   contribution_401k_percent: number;
   health_insurance_monthly: number;
@@ -61,29 +62,19 @@ export interface SimulationResult {
   rent_recommendation: RentRecommendation;
   expense_breakdown: Record<string, number>;
   notes: string[];
+  tax_assumption_notes: string[];
 }
 
 export interface CityPreset {
-  key: string;
-  name: string;
-  residence_location: ResidenceLocation;
-  transportation_type: TransportationType;
+  id: string;
+  display_name: string;
+  city: string;
+  state: string;
+  metro_area: string;
+  region: string;
   estimated_rent: number;
-  utilities: number;
-  internet: number;
-  phone: number;
-  groceries: number;
-  eating_out: number;
-  transit_cost: number;
-  car_payment: number;
-  car_insurance: number;
-  gas: number;
-  parking: number;
-  tolls: number;
-  subscriptions: number;
-  gym: number;
-  personal_spending: number;
-  other_expenses: number;
+  transportation_type: TransportationType;
+  notes: string;
 }
 
 export interface SavedScenario extends SimulationInput {
@@ -101,12 +92,15 @@ export interface CompareLocationsRequest {
   fica_exempt: boolean;
   contribution_401k_percent: number;
   health_insurance_monthly: number;
-  locations: ResidenceLocation[];
+  location_ids: string[];
 }
 
 export interface LocationComparisonResult {
-  location: ResidenceLocation;
-  preset_name: string;
+  location_id: string;
+  display_name: string;
+  city: string;
+  state: string;
+  metro_area: string;
   gross_monthly: number;
   net_monthly: number;
   rent: number;
@@ -118,6 +112,7 @@ export interface LocationComparisonResult {
   risk_level: RiskLevel;
   affordability_score: number;
   recommendation_text: string;
+  tax_assumption_notes: string[];
 }
 
 export interface CompareLocationsResponse {

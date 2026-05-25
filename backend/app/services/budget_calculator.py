@@ -56,4 +56,5 @@ def run_simulation(input_data: SimulationInput) -> SimulationResultOut:
         rent_recommendation=rent_recommendation(net_monthly, input_data.rent),
         expense_breakdown={key: round(value, 2) for key, value in expense_breakdown.items()},
         notes=taxes["notes"],
+        tax_assumption_notes=taxes["notes"],
     )

@@ -12,17 +12,17 @@ New graduates often receive an offer, pick an apartment, and only later discover
 
 - New graduates comparing first-job budgets
 - International students on OPT/F-1 evaluating salary and rent
-- Early-career workers comparing NYC, Brooklyn, Jersey City, Hoboken, and NJ suburb lifestyles
+- Early-career workers comparing major U.S. city and metro-area lifestyles
 
 ## Features
 
 - Salary, tax year, work state, residence, OPT/FICA, 401k, and health insurance inputs
 - Detailed expense setup for housing, food, transportation, and lifestyle spending
-- Approximate federal, FICA, NY, NYC, and NJ tax estimates
+- Approximate federal, FICA, NY, NYC, NJ, and effective-rate state tax estimates
 - Monthly take-home pay, expenses, leftover cash, savings rate, ratios, and risk level
 - Rent recommendation ranges: safe, stretch, and risky
-- Scenario comparison for Manhattan, Brooklyn, Jersey City, Hoboken, and NJ suburbs
-- Editable JSON tax and city preset data
+- Searchable location comparison across major U.S. city presets
+- Editable JSON city cost presets and state tax estimate data
 - Anonymous saved scenarios API
 - Recharts visualizations for expense breakdown and scenario comparison
 
@@ -84,7 +84,8 @@ npm run dev
 
 - `GET /health` returns backend status
 - `POST /api/simulate` calculates a complete simulation
-- `GET /api/city-presets` returns editable default cost presets
+- `GET /api/city-presets` returns available U.S. location presets
+- `POST /api/compare-locations` compares selected location IDs with shared salary and tax assumptions
 - `POST /api/scenarios` saves an anonymous scenario and result
 - `GET /api/scenarios` lists saved scenarios
 - `GET /api/scenarios/{id}` gets a saved scenario
@@ -92,7 +93,13 @@ npm run dev
 
 ## Calculation Notes
 
-The tax engine is intentionally approximate for MVP planning. Federal brackets and FICA settings live in `backend/app/data`. NY, NYC, NJ, and cross-state estimates are simplified in service modules so more accurate rules can be added later.
+The tax engine is intentionally approximate for MVP planning. Federal brackets, FICA settings, city presets, and state tax estimates live in `backend/app/data`.
+
+- U.S. location presets are editable estimates in `backend/app/data/city_presets.json`.
+- NY, NYC, NJ, and NY/NJ cross-state behavior use simplified dedicated MVP logic.
+- Other supported states use `backend/app/data/state_tax_estimates.json` effective-rate presets.
+- No-state-income-tax locations such as TX, FL, and WA use a 0% state income tax estimate.
+- Local city taxes outside the currently modeled NYC estimate are not modeled yet.
 
 ## Future Improvements
 

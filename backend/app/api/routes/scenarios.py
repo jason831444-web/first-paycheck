@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/scenarios", tags=["scenarios"])
 
 @router.post("", response_model=ScenarioRead, status_code=status.HTTP_201_CREATED)
 def save_scenario(payload: ScenarioCreate, db: Session = Depends(get_db)):
-    scenario = SimulationScenario(**payload.model_dump())
+    scenario = SimulationScenario(**payload.model_dump(exclude={"residence_state"}))
     db.add(scenario)
     db.flush()
     calculated = run_simulation(payload)

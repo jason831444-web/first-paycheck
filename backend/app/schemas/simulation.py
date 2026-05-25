@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 PayFrequency = Literal["monthly", "semi_monthly", "biweekly"]
 FilingStatus = Literal["single"]
 WorkState = Literal["NY", "NJ"]
-ResidenceLocation = Literal["Manhattan", "Brooklyn", "Jersey City", "Hoboken", "NJ Suburb"]
+ResidenceLocation = str
 TransportationType = Literal["public_transit", "car", "hybrid"]
 
 
@@ -15,8 +15,9 @@ class SimulationInput(BaseModel):
     pay_frequency: PayFrequency = "biweekly"
     tax_year: int = 2026
     filing_status: FilingStatus = "single"
-    work_state: WorkState
+    work_state: str
     residence_location: ResidenceLocation
+    residence_state: str | None = None
     fica_exempt: bool = False
     contribution_401k_percent: float = Field(default=0, ge=0, le=100)
     health_insurance_monthly: float = Field(default=0, ge=0)
@@ -66,3 +67,4 @@ class SimulationResultOut(BaseModel):
     rent_recommendation: RentRecommendation
     expense_breakdown: dict[str, float]
     notes: list[str] = []
+    tax_assumption_notes: list[str] = []

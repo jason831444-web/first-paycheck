@@ -1,0 +1,16 @@
+[
+  {"state":"NY","state_name":"New York","estimated_effective_rate":0.055,"has_state_income_tax":true,"notes":"NY uses simplified detailed handling in the MVP, including NYC local tax where applicable."},
+  {"state":"NJ","state_name":"New Jersey","estimated_effective_rate":0.052,"has_state_income_tax":true,"notes":"NJ uses simplified detailed handling in the MVP."},
+  {"state":"CA","state_name":"California","estimated_effective_rate":0.068,"has_state_income_tax":true,"notes":"Estimated effective rate for planning only; actual CA tax is progressive."},
+  {"state":"MA","state_name":"Massachusetts","estimated_effective_rate":0.05,"has_state_income_tax":true,"notes":"Flat-rate approximation for MVP planning."},
+  {"state":"DC","state_name":"District of Columbia","estimated_effective_rate":0.064,"has_state_income_tax":true,"notes":"Simplified DC effective rate; actual brackets differ."},
+  {"state":"VA","state_name":"Virginia","estimated_effective_rate":0.052,"has_state_income_tax":true,"notes":"Estimated effective rate for planning only."},
+  {"state":"PA","state_name":"Pennsylvania","estimated_effective_rate":0.031,"has_state_income_tax":true,"notes":"State income tax estimate; city wage taxes are not modeled."},
+  {"state":"IL","state_name":"Illinois","estimated_effective_rate":0.0495,"has_state_income_tax":true,"notes":"Flat-rate approximation for MVP planning."},
+  {"state":"GA","state_name":"Georgia","estimated_effective_rate":0.052,"has_state_income_tax":true,"notes":"Estimated effective rate for planning only."},
+  {"state":"FL","state_name":"Florida","estimated_effective_rate":0,"has_state_income_tax":false,"notes":"Florida has no state income tax in this estimate."},
+  {"state":"TX","state_name":"Texas","estimated_effective_rate":0,"has_state_income_tax":false,"notes":"Texas has no state income tax in this estimate."},
+  {"state":"CO","state_name":"Colorado","estimated_effective_rate":0.044,"has_state_income_tax":true,"notes":"Flat-rate approximation for MVP planning."},
+  {"state":"AZ","state_name":"Arizona","estimated_effective_rate":0.025,"has_state_income_tax":true,"notes":"Estimated effective rate for planning only."},
+  {"state":"WA","state_name":"Washington","estimated_effective_rate":0,"has_state_income_tax":false,"notes":"Washington has no state wage income tax in this estimate."}
+]
