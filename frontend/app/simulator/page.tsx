@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import { ArrowRight, Save } from "lucide-react";
-import { Disclaimer } from "@/components/Disclaimer";
 import { ResultDashboard } from "@/components/ResultDashboard";
 import { SimulatorSectionManager } from "@/components/SimulatorSectionManager";
 import { api } from "@/lib/api";
@@ -60,47 +59,47 @@ export default function SimulatorPage() {
   }
 
   return (
-    <main className="page-shell">
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr] lg:items-start">
-        <aside className="space-y-4 lg:sticky lg:top-24">
-          <div className="section-card">
-            <p className="eyebrow">Simulator</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">Build your first-job budget</h1>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              Start with income, taxes, and housing. Add only the budget sections that apply to your life.
-            </p>
-          </div>
-          <Disclaimer />
-        </aside>
-
-        <form onSubmit={submit} className="space-y-5">
-          <SimulatorSectionManager
-            form={form}
-            activeOptionalSections={activeOptionalSections}
-            update={update}
-            addSection={addSection}
-            removeSection={removeSection}
-            resetOptionalSections={resetOptionalSections}
-          />
-          {error ? <p className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">{error}</p> : null}
-          <div className="section-card flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="section-title">Ready to model this plan?</h2>
-              <p className="section-subtitle">Run the estimate first, then save the scenario if it is useful.</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button disabled={loading} className="primary-button">
-                {loading ? "Calculating..." : "Run simulation"}
-                <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-              </button>
-              <button type="button" onClick={saveScenario} className="secondary-button">
-                <Save className="mr-2 h-4 w-4" aria-hidden="true" />
-                Save scenario
-              </button>
-            </div>
-          </div>
-        </form>
+    <main className="page-shell max-w-[1480px]">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="max-w-3xl">
+          <p className="eyebrow">Simulator</p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">Build your first-job budget</h1>
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            Choose the sections that apply to your life. Only checked sections are included in your estimate.
+          </p>
+        </div>
+        <p className="max-w-xs rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-xs leading-5 text-slate-500">
+          Estimates are for planning only and are not tax, legal, or financial advice.
+        </p>
       </div>
+
+      <form onSubmit={submit} className="space-y-5">
+        <SimulatorSectionManager
+          form={form}
+          activeOptionalSections={activeOptionalSections}
+          update={update}
+          addSection={addSection}
+          removeSection={removeSection}
+          resetOptionalSections={resetOptionalSections}
+        />
+        {error ? <p className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">{error}</p> : null}
+        <div className="section-card mx-auto flex max-w-[1380px] flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="section-title">Ready to model this plan?</h2>
+            <p className="section-subtitle">Run the estimate first, then save the scenario if it is useful.</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button disabled={loading} className="primary-button">
+              {loading ? "Calculating..." : "Run simulation"}
+              <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+            </button>
+            <button type="button" onClick={saveScenario} className="secondary-button">
+              <Save className="mr-2 h-4 w-4" aria-hidden="true" />
+              Save scenario
+            </button>
+          </div>
+        </div>
+      </form>
       {result ? (
         <div className="mt-8">
           <ResultDashboard result={result} />
