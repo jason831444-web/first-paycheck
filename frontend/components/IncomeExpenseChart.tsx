@@ -15,11 +15,11 @@ export function IncomeExpenseChart({ result }: { result: SimulationResult }) {
     <div className="h-72">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis tickFormatter={(value) => `$${Number(value) / 1000}k`} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+          <XAxis dataKey="name" tickLine={false} axisLine={false} />
+          <YAxis tickFormatter={(value) => `$${Number(value) / 1000}k`} tickLine={false} axisLine={false} />
           <Tooltip formatter={(value: number) => usd(value)} />
-          <Bar dataKey="value" fill="#0f766e" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="value" fill="#0f766e" radius={[8, 8, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

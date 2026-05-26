@@ -11,21 +11,25 @@ interface Props {
 export function ExpenseForm({ form, update }: Props) {
   return (
     <div className="space-y-5">
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Housing expenses</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
+      <div className="section-card">
+        <p className="eyebrow">Housing</p>
+        <h2 className="section-title">Housing expenses</h2>
+        <p className="section-subtitle">Rent is the biggest driver of affordability, so keep these assumptions realistic.</p>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
           <NumberField label="Rent" value={form.rent} onChange={(rent) => update({ rent })} />
           <NumberField label="Utilities" value={form.utilities} onChange={(utilities) => update({ utilities })} />
           <NumberField label="Internet" value={form.internet} onChange={(internet) => update({ internet })} />
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Transportation expenses</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
+      <div className="section-card">
+        <p className="eyebrow">Transportation</p>
+        <h2 className="section-title">Commute and car costs</h2>
+        <p className="section-subtitle">Compare transit, car, or hybrid monthly assumptions.</p>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
           <label>
-            <span className="text-sm font-medium text-slate-700">Transportation type</span>
-            <select className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={form.transportation_type} onChange={(e) => update({ transportation_type: e.target.value as SimulationInput["transportation_type"] })}>
+            <span className="field-label">Transportation type</span>
+            <select className="field-input" value={form.transportation_type} onChange={(e) => update({ transportation_type: e.target.value as SimulationInput["transportation_type"] })}>
               <option value="public_transit">Public transit</option>
               <option value="car">Car</option>
               <option value="hybrid">Hybrid</option>
@@ -40,9 +44,11 @@ export function ExpenseForm({ form, update }: Props) {
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Lifestyle expenses</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
+      <div className="section-card">
+        <p className="eyebrow">Lifestyle</p>
+        <h2 className="section-title">Food, phone, and flexible spending</h2>
+        <p className="section-subtitle">Small recurring costs add up quickly in a first-job budget.</p>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
           <NumberField label="Phone" value={form.phone} onChange={(phone) => update({ phone })} />
           <NumberField label="Groceries" value={form.groceries} onChange={(groceries) => update({ groceries })} />
           <NumberField label="Eating out" value={form.eating_out} onChange={(eating_out) => update({ eating_out })} />

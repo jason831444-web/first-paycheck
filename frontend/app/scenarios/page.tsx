@@ -3,10 +3,13 @@ import { ScenarioComparison } from "@/components/ScenarioComparison";
 
 export default function ScenariosPage() {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-semibold tracking-tight">Compare locations</h1>
-        <p className="mt-2 text-slate-600">See how your monthly leftover changes depending on where you live.</p>
+    <main className="page-shell">
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="page-heading">
+          <p className="eyebrow">Location comparison</p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">Compare locations</h1>
+          <p className="mt-3 text-lg leading-8 text-slate-600">See where your first paycheck goes further across major U.S. cities.</p>
+        </div>
       </div>
       <Disclaimer />
       <div className="mt-6">

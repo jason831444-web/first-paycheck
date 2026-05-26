@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { ArrowRight, Save } from "lucide-react";
 import { Disclaimer } from "@/components/Disclaimer";
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { ResultDashboard } from "@/components/ResultDashboard";
@@ -69,25 +70,41 @@ export default function SimulatorPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-semibold tracking-tight">Paycheck simulator</h1>
-        <p className="mt-2 text-slate-600">Enter your offer, rent, and monthly spending assumptions.</p>
+    <main className="page-shell">
+      <div className="grid gap-6 lg:grid-cols-[280px_1fr] lg:items-start">
+        <aside className="space-y-4 lg:sticky lg:top-24">
+          <div className="section-card">
+            <p className="eyebrow">Simulator</p>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">Paycheck simulator</h1>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              Enter your offer, rent, commute, and lifestyle costs to estimate monthly take-home and affordability.
+            </p>
+          </div>
+          <Disclaimer />
+        </aside>
+
+        <form onSubmit={submit} className="space-y-5">
+          <SalaryForm form={form} update={update} />
+          <ExpenseForm form={form} update={update} />
+          {error ? <p className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">{error}</p> : null}
+          <div className="section-card flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="section-title">Ready to model this plan?</h2>
+              <p className="section-subtitle">Run the estimate first, then save the scenario if it is useful.</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button disabled={loading} className="primary-button">
+                {loading ? "Calculating..." : "Run simulation"}
+                <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+              </button>
+              <button type="button" onClick={saveScenario} className="secondary-button">
+                <Save className="mr-2 h-4 w-4" aria-hidden="true" />
+                Save scenario
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
-      <Disclaimer />
-      <form onSubmit={submit} className="mt-6 space-y-5">
-        <SalaryForm form={form} update={update} />
-        <ExpenseForm form={form} update={update} />
-        {error ? <p className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">{error}</p> : null}
-        <div className="flex flex-wrap gap-3">
-          <button disabled={loading} className="rounded-lg bg-teal-700 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-teal-800 disabled:opacity-60">
-            {loading ? "Calculating..." : "Run Simulation"}
-          </button>
-          <button type="button" onClick={saveScenario} className="rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50">
-            Save Scenario
-          </button>
-        </div>
-      </form>
       {result ? (
         <div className="mt-8">
           <ResultDashboard result={result} />
