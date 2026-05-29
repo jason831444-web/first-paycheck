@@ -1,6 +1,7 @@
 "use client";
 
 import { Download, FileSpreadsheet, Save } from "lucide-react";
+import Link from "next/link";
 import { ExpenseBreakdownChart } from "@/components/ExpenseBreakdownChart";
 import { IncomeExpenseChart } from "@/components/IncomeExpenseChart";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -15,6 +16,22 @@ const toneByRisk = {
   Tight: "warn",
   Risky: "bad",
 } as const;
+
+function comparisonHref(input: SimulationInput) {
+  const params = new URLSearchParams({
+    annualSalary: String(input.annual_salary),
+    payFrequency: input.pay_frequency,
+    taxYear: String(input.tax_year),
+    filingStatus: input.filing_status,
+    workState: input.work_state,
+    ficaExempt: String(input.fica_exempt),
+    contribution401kPercent: String(input.contribution_401k_percent),
+    healthInsuranceMonthly: String(input.health_insurance_monthly),
+    importedFrom: "simulator",
+  });
+
+  return `/scenarios?${params.toString()}`;
+}
 
 export function ResultDashboard({
   input,
@@ -44,6 +61,9 @@ export function ResultDashboard({
           <p className="section-subtitle">Download a report for offline planning or apartment comparisons.</p>
         </div>
         <div className="flex flex-wrap gap-3">
+          <Link href={comparisonHref(input)} className="secondary-button">
+            Compare this salary across cities
+          </Link>
           {onSaveBudgetPlan ? (
             <button type="button" onClick={onSaveBudgetPlan} disabled={saving} className="secondary-button disabled:cursor-not-allowed disabled:opacity-60">
               <Save className="mr-2 h-4 w-4" aria-hidden="true" />

@@ -25,8 +25,38 @@ const filters = ["All", "Northeast", "West Coast", "South", "Midwest", "No state
 const supportedWorkStates = ["NY", "NJ", "CA", "MA", "DC", "VA", "PA", "IL", "GA", "FL", "TX", "CO", "AZ", "WA"];
 const noStateIncomeTaxStates = new Set(["TX", "FL", "WA"]);
 
+function formFromQueryParams() {
+  if (typeof window === "undefined") return { form: defaultInput, imported: false };
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("importedFrom") !== "simulator" && !params.has("annualSalary")) {
+    return { form: defaultInput, imported: false };
+  }
+
+  const numberParam = (key: string, fallback: number) => {
+    const value = Number(params.get(key));
+    return Number.isFinite(value) && value >= 0 ? value : fallback;
+  };
+
+  return {
+    imported: true,
+    form: {
+      ...defaultInput,
+      annual_salary: numberParam("annualSalary", defaultInput.annual_salary),
+      pay_frequency: (params.get("payFrequency") as CompareLocationsRequest["pay_frequency"]) || defaultInput.pay_frequency,
+      tax_year: numberParam("taxYear", defaultInput.tax_year),
+      filing_status: "single" as const,
+      work_state: params.get("workState") || defaultInput.work_state,
+      fica_exempt: params.get("ficaExempt") === "true",
+      contribution_401k_percent: numberParam("contribution401kPercent", defaultInput.contribution_401k_percent),
+      health_insurance_monthly: numberParam("healthInsuranceMonthly", defaultInput.health_insurance_monthly),
+    },
+  };
+}
+
 export function ScenarioComparison() {
   const [form, setForm] = useState(defaultInput);
+  const [importedAssumptions, setImportedAssumptions] = useState(false);
   const [presets, setPresets] = useState<CityPreset[]>([]);
   const [results, setResults] = useState<LocationComparisonResult[]>([]);
   const [error, setError] = useState("");
@@ -35,6 +65,14 @@ export function ScenarioComparison() {
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
 
   useEffect(() => {
+    const imported = formFromQueryParams();
+    if (imported.imported) {
+      Promise.resolve().then(() => {
+        setForm(imported.form);
+        setImportedAssumptions(true);
+      });
+    }
+
     async function load() {
       try {
         setPresets(await api.cityPresets());
@@ -54,6 +92,12 @@ export function ScenarioComparison() {
     update({
       location_ids: selected ? form.location_ids.filter((item) => item !== locationId) : [...form.location_ids, locationId],
     });
+  }
+
+  function clearImportedAssumptions() {
+    setForm(defaultInput);
+    setImportedAssumptions(false);
+    window.history.replaceState(null, "", "/scenarios");
   }
 
   async function compare() {
@@ -103,6 +147,14 @@ export function ScenarioComparison() {
             {form.location_ids.length} selected
           </span>
         </div>
+        {importedAssumptions ? (
+          <div className="mt-4 flex flex-col gap-3 rounded-xl border border-teal-100 bg-teal-50 px-4 py-3 text-sm text-teal-900 sm:flex-row sm:items-center sm:justify-between">
+            <span>Using salary assumptions from your simulator result.</span>
+            <button type="button" onClick={clearImportedAssumptions} className="font-semibold text-teal-950 underline-offset-4 hover:underline">
+              Clear imported assumptions
+            </button>
+          </div>
+        ) : null}
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           <label>
             <span className="field-label">Annual salary</span>

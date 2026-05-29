@@ -5,6 +5,7 @@ export function Header() {
   const links = [
     { href: "/", label: "Home" },
     { href: "/simulator", label: "Simulator" },
+    { href: "/affordability", label: "Affordability check" },
     { href: "/scenarios", label: "Compare locations" },
     { href: "/saved", label: "Saved plans" },
   ];
