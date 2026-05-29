@@ -18,7 +18,7 @@ services:
   backend:
     build: ./backend
     environment:
-      DATABASE_URL: postgresql+psycopg2://firstpaycheck:firstpaycheck@db:5432/firstpaycheck
+      DATABASE_URL: postgresql+psycopg://firstpaycheck:firstpaycheck@db:5432/firstpaycheck
       CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
     ports:
       - "8000:8000"
