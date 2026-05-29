@@ -318,3 +318,76 @@ def test_what_if_generated_scenarios_do_not_create_negative_salary_or_rent():
 def test_what_if_endpoint_validates_request_body():
     response = client.post("/api/what-if", json={})
     assert response.status_code == 422
+
+
+def insights_payload(**overrides):
+    input_data = sample(fica_exempt=True, rent=1800, personal_spending=200, eating_out=180).model_dump()
+    simulation = client.post("/api/simulate", json=input_data).json()
+    payload = {"input": input_data, "result": simulation}
+    payload.update(overrides)
+    return payload
+
+
+def insight_by_id(payload, insight_id):
+    return next(item for item in payload["insights"] if item["id"] == insight_id)
+
+
+def test_insights_endpoint_returns_insights():
+    response = client.post("/api/insights", json=insights_payload())
+    assert response.status_code == 200
+    payload = response.json()
+    assert len(payload["insights"]) > 0
+    assert {"title", "severity", "category", "message", "suggested_action"} <= set(payload["insights"][0])
+
+
+def test_insights_high_housing_ratio_creates_warning_or_critical():
+    input_data = sample(fica_exempt=True, rent=3500).model_dump()
+    result = client.post("/api/simulate", json=input_data).json()
+    response = client.post("/api/insights", json={"input": input_data, "result": result})
+    assert response.status_code == 200
+    housing = next(item for item in response.json()["insights"] if item["category"] == "Housing")
+    assert housing["severity"] in {"warning", "critical"}
+    assert housing["estimated_monthly_impact"] > 0
+
+
+def test_insights_low_savings_rate_creates_warning_or_critical():
+    input_data = sample(fica_exempt=True, rent=3000, personal_spending=1200, other_expenses=900).model_dump()
+    result = client.post("/api/simulate", json=input_data).json()
+    response = client.post("/api/insights", json={"input": input_data, "result": result})
+    savings = next(item for item in response.json()["insights"] if item["category"] == "Savings")
+    assert savings["severity"] in {"warning", "critical"}
+
+
+def test_insights_negative_leftover_creates_critical_insight():
+    input_data = sample(fica_exempt=True, rent=5000, personal_spending=1400, other_expenses=1600).model_dump()
+    result = client.post("/api/simulate", json=input_data).json()
+    response = client.post("/api/insights", json={"input": input_data, "result": result})
+    savings = insight_by_id(response.json(), "negative_leftover")
+    assert savings["severity"] == "critical"
+
+
+def test_insights_fica_exempt_creates_fica_info_insight():
+    response = client.post("/api/insights", json=insights_payload())
+    fica = insight_by_id(response.json(), "fica_status_matters")
+    assert fica["severity"] == "info"
+    assert fica["category"] == "Taxes and FICA"
+
+
+def test_insights_comfortable_budget_creates_positive_overall_insight():
+    input_data = sample(fica_exempt=True, annual_salary=150000, rent=1600, personal_spending=150, eating_out=150).model_dump()
+    result = client.post("/api/simulate", json=input_data).json()
+    response = client.post("/api/insights", json={"input": input_data, "result": result})
+    overall = next(item for item in response.json()["insights"] if item["category"] == "Overall budget health")
+    assert overall["severity"] == "positive"
+
+
+def test_insights_are_limited_and_sorted_by_severity():
+    input_data = sample(fica_exempt=True, rent=5000, car_payment=700, car_insurance=300, gas=250, parking=300, personal_spending=1800, eating_out=900, other_expenses=1200).model_dump()
+    result = client.post("/api/simulate", json=input_data).json()
+    response = client.post("/api/insights", json={"input": input_data, "result": result})
+    payload = response.json()
+    rank = {"critical": 0, "warning": 1, "info": 2, "positive": 3}
+    severities = [rank[item["severity"]] for item in payload["insights"]]
+    assert len(payload["insights"]) <= 7
+    assert severities == sorted(severities)
+    assert any(item["category"] == "Overall budget health" for item in payload["insights"])

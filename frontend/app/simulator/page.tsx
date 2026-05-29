@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { AdvisorInsights } from "@/components/AdvisorInsights";
 import { ResultDashboard } from "@/components/ResultDashboard";
 import { SimulatorSectionManager } from "@/components/SimulatorSectionManager";
 import { WhatIfAnalysis } from "@/components/WhatIfAnalysis";
@@ -237,6 +238,7 @@ export default function SimulatorPage() {
       {result ? (
         <div className="mt-8 space-y-6">
           <ResultDashboard input={currentSubmittedInput} result={result} saving={saving} onSaveBudgetPlan={() => setShowSaveForm((current) => !current)} />
+          <AdvisorInsights input={currentSubmittedInput} result={result} />
           <WhatIfAnalysis input={currentSubmittedInput} baseResult={result} />
         </div>
       ) : null}

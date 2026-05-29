@@ -87,6 +87,32 @@ export interface WhatIfResponse {
   results: WhatIfResult[];
 }
 
+export type AdvisorInsightSeverity = "positive" | "info" | "warning" | "critical";
+
+export interface AdvisorInsight {
+  id: string;
+  title: string;
+  severity: AdvisorInsightSeverity;
+  category:
+    | "Housing"
+    | "Savings"
+    | "Transportation"
+    | "Food and lifestyle"
+    | "Taxes and FICA"
+    | "Emergency fund"
+    | "Debt and obligations"
+    | "Overall budget health";
+  message: string;
+  suggested_action: string;
+  estimated_monthly_impact?: number | null;
+  metric_label?: string | null;
+  metric_value?: string | null;
+}
+
+export interface AdvisorInsightsResponse {
+  insights: AdvisorInsight[];
+}
+
 export interface SavedScenarioResult {
   id: number;
   scenario_id: number;

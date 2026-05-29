@@ -1,5 +1,6 @@
 import {
   CityPreset,
+  AdvisorInsightsResponse,
   CompareLocationsRequest,
   CompareLocationsResponse,
   SavedBudgetPlanCreate,
@@ -35,6 +36,8 @@ export const api = {
     request<SimulationResult>("/api/simulate", { method: "POST", body: JSON.stringify(input) }),
   getWhatIfAnalysis: (input: SimulationInput) =>
     request<WhatIfResponse>("/api/what-if", { method: "POST", body: JSON.stringify({ base_input: input }) }),
+  getAdvisorInsights: (input: SimulationInput, result: SimulationResult) =>
+    request<AdvisorInsightsResponse>("/api/insights", { method: "POST", body: JSON.stringify({ input, result }) }),
   cityPresets: () => request<CityPreset[]>("/api/city-presets"),
   compareLocations: (input: CompareLocationsRequest) =>
     request<CompareLocationsResponse>("/api/compare-locations", { method: "POST", body: JSON.stringify(input) }),
