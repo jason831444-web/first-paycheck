@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, FileSpreadsheet } from "lucide-react";
+import { Download, FileSpreadsheet, Save } from "lucide-react";
 import { ExpenseBreakdownChart } from "@/components/ExpenseBreakdownChart";
 import { IncomeExpenseChart } from "@/components/IncomeExpenseChart";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -16,7 +16,17 @@ const toneByRisk = {
   Risky: "bad",
 } as const;
 
-export function ResultDashboard({ input, result }: { input: SimulationInput; result: SimulationResult }) {
+export function ResultDashboard({
+  input,
+  result,
+  onSaveBudgetPlan,
+  saving,
+}: {
+  input: SimulationInput;
+  result: SimulationResult;
+  onSaveBudgetPlan?: () => void;
+  saving?: boolean;
+}) {
   return (
     <section className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -34,6 +44,12 @@ export function ResultDashboard({ input, result }: { input: SimulationInput; res
           <p className="section-subtitle">Download a report for offline planning or apartment comparisons.</p>
         </div>
         <div className="flex flex-wrap gap-3">
+          {onSaveBudgetPlan ? (
+            <button type="button" onClick={onSaveBudgetPlan} disabled={saving} className="secondary-button disabled:cursor-not-allowed disabled:opacity-60">
+              <Save className="mr-2 h-4 w-4" aria-hidden="true" />
+              {saving ? "Saving..." : "Save budget plan"}
+            </button>
+          ) : null}
           <button type="button" onClick={() => void exportSimulationToExcel(input, result)} className="primary-button">
             <FileSpreadsheet className="mr-2 h-4 w-4" aria-hidden="true" />
             Export to Excel

@@ -2,6 +2,8 @@ import {
   CityPreset,
   CompareLocationsRequest,
   CompareLocationsResponse,
+  SavedBudgetPlanCreate,
+  SavedBudgetPlanUpdate,
   SavedScenario,
   SimulationInput,
   SimulationResult,
@@ -33,9 +35,17 @@ export const api = {
   cityPresets: () => request<CityPreset[]>("/api/city-presets"),
   compareLocations: (input: CompareLocationsRequest) =>
     request<CompareLocationsResponse>("/api/compare-locations", { method: "POST", body: JSON.stringify(input) }),
+  createScenario: (input: SavedBudgetPlanCreate) =>
+    request<SavedScenario>("/api/scenarios", { method: "POST", body: JSON.stringify(input) }),
   saveScenario: (input: SimulationInput) =>
     request<SavedScenario>("/api/scenarios", { method: "POST", body: JSON.stringify(input) }),
+  listScenarios: () => request<SavedScenario[]>("/api/scenarios"),
   scenarios: () => request<SavedScenario[]>("/api/scenarios"),
+  getScenario: (id: number) => request<SavedScenario>(`/api/scenarios/${id}`),
   scenario: (id: number) => request<SavedScenario>(`/api/scenarios/${id}`),
+  updateScenario: (id: number, input: SavedBudgetPlanUpdate) =>
+    request<SavedScenario>(`/api/scenarios/${id}`, { method: "PUT", body: JSON.stringify(input) }),
+  duplicateScenario: (id: number) =>
+    request<SavedScenario>(`/api/scenarios/${id}/duplicate`, { method: "POST" }),
   deleteScenario: (id: number) => request<void>(`/api/scenarios/${id}`, { method: "DELETE" }),
 };

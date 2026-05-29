@@ -6,6 +6,7 @@ export function Header() {
     { href: "/", label: "Home" },
     { href: "/simulator", label: "Simulator" },
     { href: "/scenarios", label: "Compare locations" },
+    { href: "/saved", label: "Saved plans" },
   ];
 
   return (

@@ -65,6 +65,28 @@ export interface SimulationResult {
   tax_assumption_notes: string[];
 }
 
+export interface SavedScenarioResult {
+  id: number;
+  scenario_id: number;
+  gross_monthly: number;
+  federal_tax_monthly: number;
+  state_tax_monthly: number;
+  local_tax_monthly: number;
+  fica_monthly: number;
+  contribution_401k_monthly: number;
+  health_insurance_monthly: number;
+  net_monthly: number;
+  total_expenses: number;
+  monthly_leftover: number;
+  savings_rate: number;
+  housing_ratio: number;
+  transportation_ratio: number;
+  affordability_score: number;
+  risk_level: RiskLevel;
+  recommendation_text: string;
+  created_at: string;
+}
+
 export interface CityPreset {
   id: string;
   display_name: string;
@@ -80,7 +102,32 @@ export interface CityPreset {
 export interface SavedScenario extends SimulationInput {
   id: number;
   created_at: string;
-  result?: SimulationResult;
+  updated_at?: string | null;
+  active_sections?: string[] | null;
+  section_values?: Record<string, unknown> | null;
+  custom_expenses?: Record<string, unknown>[] | null;
+  mapped_input?: Partial<SimulationInput> | null;
+  result_data?: Partial<SimulationResult> | null;
+  result?: SavedScenarioResult | null;
+}
+
+export type SavedBudgetPlan = SavedScenario;
+
+export interface SavedBudgetPlanCreate extends SimulationInput {
+  active_sections?: string[];
+  section_values?: Record<string, unknown>;
+  custom_expenses?: Record<string, unknown>[];
+  mapped_input?: SimulationInput;
+  result_data?: SimulationResult;
+}
+
+export interface SavedBudgetPlanUpdate {
+  name?: string;
+  active_sections?: string[];
+  section_values?: Record<string, unknown>;
+  custom_expenses?: Record<string, unknown>[];
+  mapped_input?: SimulationInput;
+  result_data?: SimulationResult;
 }
 
 export interface CompareLocationsRequest {

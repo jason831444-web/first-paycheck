@@ -4,10 +4,13 @@ from fastapi.testclient import TestClient
 
 os.environ["DATABASE_URL"] = "sqlite+pysqlite:///:memory:"
 
+from app.db.base import Base
+from app.db.session import engine
 from app.main import app
 from tests.test_calculations import sample
 
 
+Base.metadata.create_all(bind=engine)
 client = TestClient(app)
 
 
@@ -86,3 +89,79 @@ def test_no_state_income_tax_locations_do_not_add_state_tax_estimate():
     assert response.status_code == 200
     for item in response.json()["results"]:
         assert any("no state income tax" in note for note in item["tax_assumption_notes"])
+
+
+def saved_plan_payload(**overrides):
+    payload = sample(fica_exempt=True).model_dump()
+    mapped_input = payload.copy()
+    payload.update(
+        {
+            "name": "NYC budget with car",
+            "active_sections": ["food", "car", "custom"],
+            "section_values": {
+                "annual_salary": 100000,
+                "coffee": 45,
+                "car_payment": 350,
+                "custom_expenses": [{"id": "row-1", "name": "Therapy", "amount": 120}],
+            },
+            "custom_expenses": [{"id": "row-1", "name": "Therapy", "amount": 120}],
+            "mapped_input": mapped_input,
+            "result_data": {"net_monthly": 6000, "monthly_leftover": 1200, "risk_level": "Manageable"},
+        }
+    )
+    payload.update(overrides)
+    return payload
+
+
+def test_create_scenario_preserves_full_budget_plan_state():
+    response = client.post("/api/scenarios", json=saved_plan_payload())
+    assert response.status_code == 201
+    payload = response.json()
+    assert payload["name"] == "NYC budget with car"
+    assert payload["active_sections"] == ["food", "car", "custom"]
+    assert payload["section_values"]["coffee"] == 45
+    assert payload["custom_expenses"][0]["name"] == "Therapy"
+    assert payload["mapped_input"]["annual_salary"] == 100000
+    assert payload["result_data"]["risk_level"] == "Manageable"
+    assert payload["result"]["net_monthly"] > 0
+
+
+def test_list_and_get_saved_scenarios_return_json_state():
+    created = client.post("/api/scenarios", json=saved_plan_payload(name="Plan to retrieve")).json()
+    list_response = client.get("/api/scenarios")
+    assert list_response.status_code == 200
+    assert any(item["id"] == created["id"] for item in list_response.json())
+
+    get_response = client.get(f"/api/scenarios/{created['id']}")
+    assert get_response.status_code == 200
+    payload = get_response.json()
+    assert payload["active_sections"] == ["food", "car", "custom"]
+    assert payload["section_values"]["custom_expenses"][0]["amount"] == 120
+
+
+def test_delete_saved_scenario():
+    created = client.post("/api/scenarios", json=saved_plan_payload(name="Delete me")).json()
+    delete_response = client.delete(f"/api/scenarios/{created['id']}")
+    assert delete_response.status_code == 204
+    assert client.get(f"/api/scenarios/{created['id']}").status_code == 404
+
+
+def test_create_scenario_without_json_fields_is_backward_compatible():
+    response = client.post("/api/scenarios", json=sample().model_dump())
+    assert response.status_code == 201
+    payload = response.json()
+    assert payload["active_sections"] is None
+    assert payload["section_values"] is None
+    assert payload["custom_expenses"] is None
+    assert payload["mapped_input"]["annual_salary"] == 100000
+
+
+def test_duplicate_saved_scenario_copies_budget_plan_state():
+    created = client.post("/api/scenarios", json=saved_plan_payload(name="Original plan")).json()
+    duplicate_response = client.post(f"/api/scenarios/{created['id']}/duplicate")
+    assert duplicate_response.status_code == 201
+    duplicate = duplicate_response.json()
+    assert duplicate["name"] == "Copy of Original plan"
+    assert duplicate["id"] != created["id"]
+    assert duplicate["active_sections"] == created["active_sections"]
+    assert duplicate["custom_expenses"] == created["custom_expenses"]
