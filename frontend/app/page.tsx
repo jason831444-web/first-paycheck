@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, BadgeDollarSign, Building2, Calculator, CalendarClock, CheckCircle2, CircleDollarSign, ClipboardList, Goal, Home, MapPinned, ShieldCheck, WalletCards } from "lucide-react";
+import { ArrowRight, BadgeDollarSign, Building2, Calculator, CheckCircle2, CircleDollarSign, MapPinned, ShieldCheck } from "lucide-react";
 import { Disclaimer } from "@/components/Disclaimer";
+import { planningToolCards } from "@/lib/toolCards";
 
 const features = [
   {
@@ -29,45 +30,6 @@ const previewRows = [
   ["Brooklyn, NY", "$6,280", "$2,750", "$1,240", "Manageable"],
   ["Austin, TX", "$6,980", "$1,900", "$1,860", "Comfortable"],
   ["Seattle, WA", "$6,980", "$2,550", "$1,420", "Manageable"],
-];
-
-const planningTools = [
-  {
-    title: "Apartment comparison",
-    body: "Compare rent, commute costs, move-in cash, and monthly leftover before signing.",
-    href: "/apartments",
-    icon: Home,
-  },
-  {
-    title: "Move-in cash planner",
-    body: "Estimate upfront cash, savings gaps, and months to reach your move-in target.",
-    href: "/apartments",
-    icon: WalletCards,
-  },
-  {
-    title: "First 90 days cashflow",
-    body: "Model paycheck timing, move-in costs, reimbursements, and early cash pressure.",
-    href: "/cashflow",
-    icon: CalendarClock,
-  },
-  {
-    title: "Job offer comparison",
-    body: "Compare offers by take-home pay, location costs, and first-year financial fit.",
-    href: "/offers",
-    icon: ClipboardList,
-  },
-  {
-    title: "Budget goal calculator",
-    body: "Start with a savings goal and calculate rent, car, and spending limits.",
-    href: "/goals",
-    icon: Goal,
-  },
-  {
-    title: "Paycheck calendar",
-    body: "Plan around rent, bills, and two-paycheck or three-paycheck months.",
-    href: "/paycheck-calendar",
-    icon: CalendarClock,
-  },
 ];
 
 export default function HomePage() {
@@ -161,21 +123,27 @@ export default function HomePage() {
       </section>
 
       <section className="py-8">
-        <div className="mb-5">
-          <p className="eyebrow">Planning tools</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Decision support for the messy real-life parts</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Move beyond a single calculator result with tools for apartments, job offers, move-in cash, paycheck timing, and savings goals.
-          </p>
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="eyebrow">Planning tools</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Decision support for the messy real-life parts</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              Move beyond a single calculator result with tools for apartments, job offers, move-in cash, paycheck timing, and savings goals.
+            </p>
+          </div>
+          <Link href="/tools" className="secondary-button shrink-0">
+            Explore planning tools
+            <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {planningTools.map((tool) => (
+          {planningToolCards.slice(0, 6).map((tool) => (
             <Link key={tool.title} href={tool.href} className="section-card block transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-[0_20px_60px_rgba(15,118,110,0.10)]">
               <div className="grid h-11 w-11 place-items-center rounded-xl bg-teal-50 text-teal-700">
                 <tool.icon className="h-5 w-5" aria-hidden="true" />
               </div>
               <h3 className="mt-5 text-base font-semibold text-slate-950">{tool.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{tool.body}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{tool.description}</p>
             </Link>
           ))}
         </div>
