@@ -165,6 +165,18 @@ export function ResultDashboard({
           ))}
         </div>
       </div>
+
+      <div className="section-card">
+        <h2 className="section-title">Tax assumptions</h2>
+        <p className="section-subtitle">State rules are data-driven planning estimates; local taxes are only modeled where explicitly supported.</p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {result.tax_assumption_notes.map((note) => (
+            <p key={note} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+              {note}
+            </p>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

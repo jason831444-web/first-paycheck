@@ -1,7 +1,7 @@
 from app.schemas.simulation import SimulationInput
 from app.services.affordability import classify_risk, rent_recommendation
 from app.services.budget_calculator import run_simulation
-from app.services.tax_calculator import calculate_federal_tax, calculate_fica
+from app.services.tax_calculator import calculate_federal_tax, calculate_fica, calculate_state_and_local_tax
 
 
 def sample(**overrides):
@@ -68,3 +68,36 @@ def test_run_simulation_returns_result():
     assert result.net_monthly > 0
     assert result.total_expenses > 0
     assert result.rent_recommendation.current_rent_status in {"Safe", "Stretch", "Risky"}
+
+
+def test_no_income_tax_state_calculates_zero_state_tax():
+    state_tax, local_tax, notes = calculate_state_and_local_tax(
+        sample(work_state="TX", residence_state="TX", residence_location="Austin, TX")
+    )
+    assert state_tax == 0
+    assert local_tax == 0
+    assert any("no broad-based wage income tax" in note for note in notes)
+
+
+def test_flat_tax_state_calculates_positive_state_tax():
+    state_tax, _, notes = calculate_state_and_local_tax(
+        sample(work_state="CO", residence_state="CO", residence_location="Denver, CO")
+    )
+    assert state_tax > 0
+    assert any("flat-rate estimate" in note for note in notes)
+
+
+def test_progressive_tax_state_calculates_positive_state_tax():
+    state_tax, _, notes = calculate_state_and_local_tax(
+        sample(work_state="CA", residence_state="CA", residence_location="San Francisco, CA")
+    )
+    assert state_tax > 0
+    assert any("progressive 2026 brackets" in note for note in notes)
+
+
+def test_estimate_tax_state_uses_effective_rate():
+    state_tax, _, notes = calculate_state_and_local_tax(
+        sample(work_state="AL", residence_state="AL", residence_location="Birmingham, AL")
+    )
+    assert state_tax == 4100
+    assert any("effective-rate estimate" in note for note in notes)

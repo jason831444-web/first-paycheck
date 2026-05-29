@@ -23,7 +23,7 @@ const defaultInput: CompareLocationsRequest = {
 
 const filters = ["All", "Northeast", "West Coast", "South", "Midwest", "No state income tax"] as const;
 const supportedWorkStates = ["NY", "NJ", "CA", "MA", "DC", "VA", "PA", "IL", "GA", "FL", "TX", "CO", "AZ", "WA"];
-const noStateIncomeTaxStates = new Set(["TX", "FL", "WA"]);
+const noStateIncomeTaxStates = new Set(["AK", "FL", "NV", "NH", "SD", "TN", "TX", "WA", "WY"]);
 
 function formFromQueryParams() {
   if (typeof window === "undefined") return { form: defaultInput, imported: false };

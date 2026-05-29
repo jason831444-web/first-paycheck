@@ -1,4 +1,6 @@
+import json
 import os
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
@@ -12,6 +14,12 @@ from tests.test_calculations import sample
 
 Base.metadata.create_all(bind=engine)
 client = TestClient(app)
+DATA_DIR = Path(__file__).resolve().parents[1] / "app" / "data"
+
+
+def load_data_file(name: str):
+    with (DATA_DIR / name).open() as file:
+        return json.load(file)
 
 
 def test_simulate_endpoint():
@@ -47,6 +55,24 @@ def test_city_presets_returns_major_us_locations():
     assert {"id", "display_name", "city", "state", "metro_area", "region", "estimated_rent", "transportation_type", "notes"} <= set(presets[0])
 
 
+def test_state_tax_data_includes_all_states_and_dc():
+    expected_states = {
+        "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+        "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+        "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+        "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+        "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC",
+    }
+    tax_states = {item["state"] for item in load_data_file("state_tax_2026.json")}
+    assert tax_states == expected_states
+
+
+def test_every_city_preset_state_has_state_tax_rule():
+    tax_states = {item["state"] for item in load_data_file("state_tax_2026.json")}
+    preset_states = {item["state"] for item in load_data_file("city_presets.json")}
+    assert preset_states <= tax_states
+
+
 def test_compare_locations_endpoint_returns_selected_results():
     response = client.post("/api/compare-locations", json=compare_payload(location_ids=["new-york-ny", "austin-tx"]))
     assert response.status_code == 200
@@ -77,18 +103,41 @@ def test_compare_locations_applies_nyc_local_tax_for_manhattan_and_brooklyn():
     assert any("NYC local tax" in note for note in manhattan["tax_assumption_notes"])
 
 
-def test_compare_locations_uses_state_tax_fallback_for_non_detailed_states():
+def test_compare_locations_uses_state_tax_data_for_progressive_states():
     response = client.post("/api/compare-locations", json=compare_payload(location_ids=["san-francisco-ca", "seattle-wa"]))
     assert response.status_code == 200
     california = next(item for item in response.json()["results"] if item["state"] == "CA")
-    assert any("effective rate preset" in note for note in california["tax_assumption_notes"])
+    assert any("progressive 2026 brackets" in note for note in california["tax_assumption_notes"])
 
 
 def test_no_state_income_tax_locations_do_not_add_state_tax_estimate():
     response = client.post("/api/compare-locations", json=compare_payload(location_ids=["austin-tx", "miami-fl", "seattle-wa"]))
     assert response.status_code == 200
     for item in response.json()["results"]:
-        assert any("no state income tax" in note for note in item["tax_assumption_notes"])
+        assert any("no broad-based wage income tax" in note for note in item["tax_assumption_notes"])
+
+
+def test_simulate_endpoint_works_for_representative_states():
+    for state, location, expected_state_tax in [
+        ("CA", "San Francisco, CA", True),
+        ("TX", "Austin, TX", False),
+        ("WA", "Seattle, WA", False),
+        ("NY", "New York, NY", True),
+        ("NJ", "Jersey City, NJ", True),
+        ("MA", "Boston, MA", True),
+        ("DC", "Washington, DC", True),
+    ]:
+        payload = sample(
+            work_state=state,
+            residence_state=state,
+            residence_location=location,
+            fica_exempt=True,
+        ).model_dump()
+        response = client.post("/api/simulate", json=payload)
+        assert response.status_code == 200
+        body = response.json()
+        assert body["state_tax_monthly"] > 0 if expected_state_tax else body["state_tax_monthly"] == 0
+        assert body["tax_assumption_notes"]
 
 
 def saved_plan_payload(**overrides):
