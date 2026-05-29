@@ -143,7 +143,23 @@ export interface CityPreset {
   metro_area: string;
   region: string;
   estimated_rent: number;
+  rent?: number;
+  utilities?: number;
+  internet?: number;
+  phone?: number;
+  groceries?: number;
+  eating_out?: number;
   transportation_type: TransportationType;
+  transit_cost?: number;
+  car_payment?: number;
+  car_insurance?: number;
+  gas?: number;
+  parking?: number;
+  tolls?: number;
+  subscriptions?: number;
+  gym?: number;
+  personal_spending?: number;
+  other_expenses?: number;
   notes: string;
 }
 

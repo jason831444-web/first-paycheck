@@ -5,9 +5,14 @@ export function Header() {
   const links = [
     { href: "/", label: "Home" },
     { href: "/simulator", label: "Simulator" },
-    { href: "/affordability", label: "Affordability check" },
-    { href: "/scenarios", label: "Compare locations" },
-    { href: "/saved", label: "Saved plans" },
+    { href: "/scenarios", label: "Compare" },
+    { href: "/affordability", label: "Rent check" },
+    { href: "/apartments", label: "Apartments" },
+    { href: "/offers", label: "Offers" },
+    { href: "/cashflow", label: "Cashflow" },
+    { href: "/goals", label: "Goals" },
+    { href: "/paycheck-calendar", label: "Pay calendar" },
+    { href: "/saved", label: "Saved" },
   ];
 
   return (
