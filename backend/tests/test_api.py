@@ -165,3 +165,107 @@ def test_duplicate_saved_scenario_copies_budget_plan_state():
     assert duplicate["id"] != created["id"]
     assert duplicate["active_sections"] == created["active_sections"]
     assert duplicate["custom_expenses"] == created["custom_expenses"]
+
+
+def what_if_payload(**overrides):
+    payload = {"base_input": sample(fica_exempt=True).model_dump()}
+    payload.update(overrides)
+    return payload
+
+
+def test_what_if_endpoint_returns_base_and_default_scenarios():
+    response = client.post("/api/what-if", json=what_if_payload())
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["base_result"]["monthly_leftover"] > 0
+    assert len(payload["results"]) > 0
+    assert {"id", "label", "result", "monthly_leftover_delta", "insight"} <= set(payload["results"][0])
+
+
+def test_what_if_rent_increase_reduces_monthly_leftover():
+    base_input = sample(fica_exempt=True).model_dump()
+    response = client.post(
+        "/api/what-if",
+        json=what_if_payload(
+            base_input=base_input,
+            scenarios=[
+                {
+                    "id": "rent_plus_300",
+                    "label": "Rent +$300",
+                    "description": "Your rent increases by $300 per month.",
+                    "patch": {"rent": base_input["rent"] + 300},
+                }
+            ],
+        ),
+    )
+    assert response.status_code == 200
+    result = response.json()["results"][0]
+    assert result["monthly_leftover_delta"] == -300
+    assert result["result"]["monthly_leftover"] < response.json()["base_result"]["monthly_leftover"]
+
+
+def test_what_if_salary_decrease_reduces_net_monthly_income():
+    base_input = sample(fica_exempt=True).model_dump()
+    response = client.post(
+        "/api/what-if",
+        json=what_if_payload(
+            base_input=base_input,
+            scenarios=[
+                {
+                    "id": "salary_minus_10000",
+                    "label": "Salary -$10k",
+                    "description": "Your annual salary is $10,000 lower.",
+                    "patch": {"annual_salary": base_input["annual_salary"] - 10000},
+                }
+            ],
+        ),
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["results"][0]["result"]["net_monthly"] < payload["base_result"]["net_monthly"]
+    assert payload["results"][0]["monthly_leftover_delta"] < 0
+
+
+def test_what_if_fica_removed_increases_tax_burden_when_exempt():
+    response = client.post("/api/what-if", json=what_if_payload())
+    assert response.status_code == 200
+    payload = response.json()
+    fica_removed = next(item for item in payload["results"] if item["id"] == "fica_removed")
+    assert payload["base_result"]["fica_monthly"] == 0
+    assert fica_removed["result"]["fica_monthly"] > payload["base_result"]["fica_monthly"]
+    assert fica_removed["result"]["net_monthly"] < payload["base_result"]["net_monthly"]
+
+
+def test_what_if_ignores_unknown_patch_fields_safely():
+    base_input = sample(fica_exempt=True).model_dump()
+    response = client.post(
+        "/api/what-if",
+        json=what_if_payload(
+            base_input=base_input,
+            scenarios=[
+                {
+                    "id": "unknown_patch",
+                    "label": "Unknown patch",
+                    "description": "Unknown fields should be ignored.",
+                    "patch": {"not_a_field": 999, "rent": base_input["rent"] + 100},
+                }
+            ],
+        ),
+    )
+    assert response.status_code == 200
+    assert response.json()["results"][0]["monthly_leftover_delta"] == -100
+
+
+def test_what_if_generated_scenarios_do_not_create_negative_salary_or_rent():
+    low_input = sample(fica_exempt=False, annual_salary=9000, rent=100).model_dump()
+    response = client.post("/api/what-if", json=what_if_payload(base_input=low_input))
+    assert response.status_code == 200
+    scenario_ids = {item["id"] for item in response.json()["results"]}
+    assert "salary_minus_10000" not in scenario_ids
+    rent_minus = next(item for item in response.json()["results"] if item["id"] == "rent_minus_300")
+    assert rent_minus["result"]["expense_breakdown"]["housing"] >= 0
+
+
+def test_what_if_endpoint_validates_request_body():
+    response = client.post("/api/what-if", json={})
+    assert response.status_code == 422

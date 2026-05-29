@@ -7,6 +7,7 @@ import {
   SavedScenario,
   SimulationInput,
   SimulationResult,
+  WhatIfResponse,
 } from "@/types/simulation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
@@ -32,6 +33,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 export const api = {
   simulate: (input: SimulationInput) =>
     request<SimulationResult>("/api/simulate", { method: "POST", body: JSON.stringify(input) }),
+  getWhatIfAnalysis: (input: SimulationInput) =>
+    request<WhatIfResponse>("/api/what-if", { method: "POST", body: JSON.stringify({ base_input: input }) }),
   cityPresets: () => request<CityPreset[]>("/api/city-presets"),
   compareLocations: (input: CompareLocationsRequest) =>
     request<CompareLocationsResponse>("/api/compare-locations", { method: "POST", body: JSON.stringify(input) }),

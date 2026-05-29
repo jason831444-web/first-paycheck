@@ -65,6 +65,28 @@ export interface SimulationResult {
   tax_assumption_notes: string[];
 }
 
+export interface WhatIfScenario {
+  id: string;
+  label: string;
+  description: string;
+  patch: Partial<SimulationInput>;
+}
+
+export interface WhatIfResult {
+  id: string;
+  label: string;
+  description: string;
+  result: SimulationResult;
+  monthly_leftover_delta: number;
+  risk_changed: boolean;
+  insight: string;
+}
+
+export interface WhatIfResponse {
+  base_result: SimulationResult;
+  results: WhatIfResult[];
+}
+
 export interface SavedScenarioResult {
   id: number;
   scenario_id: number;

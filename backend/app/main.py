@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import city_presets, compare_locations, health, scenarios, simulate
+from app.api.routes import city_presets, compare_locations, health, scenarios, simulate, what_if
 from app.core.config import settings
 
 app = FastAPI(title="FirstPaycheck API", version="0.1.0")
@@ -19,3 +19,4 @@ app.include_router(simulate.router)
 app.include_router(city_presets.router)
 app.include_router(compare_locations.router)
 app.include_router(scenarios.router)
+app.include_router(what_if.router)

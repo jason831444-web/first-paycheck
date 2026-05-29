@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { ResultDashboard } from "@/components/ResultDashboard";
 import { SimulatorSectionManager } from "@/components/SimulatorSectionManager";
+import { WhatIfAnalysis } from "@/components/WhatIfAnalysis";
 import { api } from "@/lib/api";
 import {
   OptionalSectionId,
@@ -234,8 +235,9 @@ export default function SimulatorPage() {
         {saveMessage ? <p className="rounded-2xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900">{saveMessage}</p> : null}
       </form>
       {result ? (
-        <div className="mt-8">
+        <div className="mt-8 space-y-6">
           <ResultDashboard input={currentSubmittedInput} result={result} saving={saving} onSaveBudgetPlan={() => setShowSaveForm((current) => !current)} />
+          <WhatIfAnalysis input={currentSubmittedInput} baseResult={result} />
         </div>
       ) : null}
     </main>
