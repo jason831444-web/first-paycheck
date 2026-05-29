@@ -1,9 +1,13 @@
+"use client";
+
+import { Download, FileSpreadsheet } from "lucide-react";
 import { ExpenseBreakdownChart } from "@/components/ExpenseBreakdownChart";
 import { IncomeExpenseChart } from "@/components/IncomeExpenseChart";
 import { StatusBadge } from "@/components/StatusBadge";
 import { SummaryCard } from "@/components/SummaryCard";
+import { exportSimulationToCSV, exportSimulationToExcel } from "@/lib/exportReports";
 import { percent, usd } from "@/lib/formatters";
-import { SimulationResult } from "@/types/simulation";
+import { SimulationInput, SimulationResult } from "@/types/simulation";
 
 const toneByRisk = {
   Comfortable: "good",
@@ -12,7 +16,7 @@ const toneByRisk = {
   Risky: "bad",
 } as const;
 
-export function ResultDashboard({ result }: { result: SimulationResult }) {
+export function ResultDashboard({ input, result }: { input: SimulationInput; result: SimulationResult }) {
   return (
     <section className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -22,6 +26,23 @@ export function ResultDashboard({ result }: { result: SimulationResult }) {
           <p className="mt-2 text-sm leading-6 text-slate-600">A planning estimate for income, spending pressure, and savings cushion.</p>
         </div>
         <StatusBadge status={result.risk_level} />
+      </div>
+
+      <div className="section-card flex flex-col gap-4 border-teal-100 bg-white sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="section-title">Export Budget Report</h3>
+          <p className="section-subtitle">Download a report for offline planning or apartment comparisons.</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button type="button" onClick={() => void exportSimulationToExcel(input, result)} className="primary-button">
+            <FileSpreadsheet className="mr-2 h-4 w-4" aria-hidden="true" />
+            Export to Excel
+          </button>
+          <button type="button" onClick={() => exportSimulationToCSV(input, result)} className="secondary-button">
+            <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+            Download CSV
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">

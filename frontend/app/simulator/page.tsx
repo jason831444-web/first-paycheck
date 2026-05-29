@@ -11,12 +11,13 @@ import {
   simulatorDefaults,
   SimulatorFormState,
 } from "@/lib/simulatorSections";
-import { SimulationResult } from "@/types/simulation";
+import { SimulationInput, SimulationResult } from "@/types/simulation";
 
 export default function SimulatorPage() {
   const [form, setForm] = useState<SimulatorFormState>(simulatorDefaults);
   const [activeOptionalSections, setActiveOptionalSections] = useState<OptionalSectionId[]>([]);
   const [result, setResult] = useState<SimulationResult | null>(null);
+  const [submittedInput, setSubmittedInput] = useState<SimulationInput | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -41,7 +42,9 @@ export default function SimulatorPage() {
     setLoading(true);
     setError("");
     try {
-      setResult(await api.simulate(simulationInput));
+      const nextResult = await api.simulate(simulationInput);
+      setResult(nextResult);
+      setSubmittedInput(simulationInput);
     } catch {
       setError("Simulation failed. Confirm the backend is running and try again.");
     } finally {
@@ -102,7 +105,7 @@ export default function SimulatorPage() {
       </form>
       {result ? (
         <div className="mt-8">
-          <ResultDashboard result={result} />
+          <ResultDashboard input={submittedInput ?? simulationInput} result={result} />
         </div>
       ) : null}
     </main>

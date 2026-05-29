@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, X } from "lucide-react";
+import { Download, FileSpreadsheet, Search, X } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "@/lib/api";
+import { exportComparisonToCSV, exportComparisonToExcel } from "@/lib/exportReports";
 import { percent, usd } from "@/lib/formatters";
 import { StatusBadge } from "@/components/StatusBadge";
 import { CityPreset, CompareLocationsRequest, LocationComparisonResult } from "@/types/simulation";
@@ -204,6 +205,26 @@ export function ScenarioComparison() {
       </div>
 
       {error ? <p className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">{error}</p> : null}
+
+      {results.length > 0 ? (
+        <div className="section-card flex flex-col gap-4 border-teal-100 bg-white sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="eyebrow">Export Budget Report</p>
+            <h2 className="section-title">Download comparison results</h2>
+            <p className="section-subtitle">Download a report for offline planning or apartment comparisons.</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button type="button" onClick={() => void exportComparisonToExcel(results)} className="primary-button">
+              <FileSpreadsheet className="mr-2 h-4 w-4" aria-hidden="true" />
+              Export comparison to Excel
+            </button>
+            <button type="button" onClick={() => exportComparisonToCSV(results)} className="secondary-button">
+              <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+              Download comparison CSV
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       {results.length > 0 ? (
         <div className="grid gap-4 lg:grid-cols-2">
